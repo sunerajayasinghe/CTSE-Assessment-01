@@ -6,6 +6,9 @@ import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import DryCleaningScreen from "./screens/DryCleaningScreen";
+import PickUpScreen from "./screens/PickUpScreen";
+import CartScreen from "./screens/CartScreen";
+import OrderScreen from "./screens/OderScreen";
 
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -37,6 +40,21 @@ const StackNavigator = () => {
           name="DryClean"
           component={DryCleaningScreen}
           // options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="PickUp"
+          component={PickUpScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Cart"
+          component={CartScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Order"
+          component={OrderScreen}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

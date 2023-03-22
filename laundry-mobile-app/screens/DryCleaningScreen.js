@@ -11,6 +11,7 @@ import {
 import DressItem from "../components/DressItem";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { getProducts } from "../ProductReducer";
 
@@ -102,9 +103,13 @@ const DryCleaningScreen = () => {
   const [isPickerVisible, setPickerVisibility] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [selectedTime, setSelectedTime] = useState(new Date());
+  const navigation = useNavigation();
+  //
+  const total = cart
+    .map((item) => item.quantity * item.price)
+    .reduce((curr, prev) => curr + prev, 0);
   //
   const product = useSelector((state) => state.product.product);
-  console.log(product);
   const dispatch = useDispatch();
   //
   useEffect(() => {
@@ -144,25 +149,125 @@ const DryCleaningScreen = () => {
   };
 
   return (
-    <ScrollView style={{ backgroundColor: "#F0F0F0", flex: 1, marginTop: 5 }}>
-      <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          marginTop: 20,
-        }}
-      >
-        <Text style={{ fontSize: 25, color: "black", fontWeight: "bold" }}>
-          Receive Your Time
-        </Text>
-      </View>
+    <>
+      <ScrollView style={{ backgroundColor: "#F0F0F0", flex: 1, marginTop: 5 }}>
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 20,
+          }}
+        >
+          <Text style={{ fontSize: 25, color: "black", fontWeight: "bold" }}>
+            Receive Your Time
+          </Text>
+        </View>
 
-      <View
-        style={{
-          padding: 30,
-          marginTop: 0,
-        }}
-      >
+        <View
+          style={{
+            padding: 30,
+            marginTop: 0,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 15,
+              color: "#808080",
+              fontWeight: "bold",
+              textAlign: "center",
+              marginBottom: 15,
+            }}
+          >
+            Select a date & Time
+          </Text>
+          {/* ///////////// */}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-around",
+              alignItems: "center",
+            }}
+          >
+            <Pressable onPress={showDatePicker} style={{ width: 100 }}>
+              <Text
+                style={{
+                  borderColor: "gray",
+                  borderRadius: 4,
+                  borderWidth: 0.8,
+                  marginVertical: 10,
+                  color: "black",
+                  textAlign: "center",
+                  padding: 5,
+                  fontSize: 17,
+                  fontWeight: "bold",
+                }}
+              >
+                Select Date
+              </Text>
+            </Pressable>
+            <Pressable onPress={showPicker} style={{ width: 110 }}>
+              <Text
+                style={{
+                  borderColor: "gray",
+                  borderRadius: 4,
+                  borderWidth: 0.8,
+                  marginVertical: 10,
+                  color: "black",
+                  textAlign: "center",
+                  padding: 5,
+                  fontSize: 17,
+                  fontWeight: "bold",
+                }}
+              >
+                Select Time
+              </Text>
+            </Pressable>
+          </View>
+
+          <Modal
+            visible={isDatePickerVisible}
+            animationType="slide"
+            transparent={true}
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "red",
+            }}
+          >
+            <View style={{ backgroundColor: "#fff", padding: 20 }}>
+              <TouchableOpacity onPress={() => setDatePickerVisibility(false)}>
+                <Text style={{ alignSelf: "flex-end", marginBottom: 10 }}>
+                  Close
+                </Text>
+              </TouchableOpacity>
+              <Calendar
+                onDayPress={onDayPress}
+                markedDates={{
+                  [selectedDate]: { selected: true },
+                }}
+                theme={{
+                  calendarBackground: "#ffffff",
+                  todayTextColor: "#007aff",
+                  dayTextColor: "#2d4150",
+                  textDisabledColor: "#d9e1e8",
+                  selectedDayTextColor: "#ffffff",
+                  selectedDayBackgroundColor: "#007aff",
+                  dotColor: "#007aff",
+                  selectedDotColor: "#ffffff",
+                  arrowColor: "#007aff",
+                  monthTextColor: "#007aff",
+                  textSectionTitleColor: "#007aff",
+                }}
+              />
+            </View>
+          </Modal>
+          <DateTimePickerModal
+            isVisible={isPickerVisible}
+            mode="time"
+            onConfirm={handleConfirm}
+            onCancel={hidePicker}
+          />
+        </View>
         <Text
           style={{
             fontSize: 15,
@@ -172,112 +277,50 @@ const DryCleaningScreen = () => {
             marginBottom: 15,
           }}
         >
-          Select a date & Time
+          Add to Bucket
         </Text>
-        {/* ///////////// */}
-        <View
+        {/* Render all the Products */}
+        {product.map((item, index) => (
+          <DressItem item={item} key={index} />
+        ))}
+      </ScrollView>
+      {total === 0 ? null : (
+        <Pressable
           style={{
+            backgroundColor: "#088F8F",
+            padding: 10,
+            marginBottom: 40,
+            margin: 15,
+            borderRadius: 7,
             flexDirection: "row",
-            justifyContent: "space-around",
             alignItems: "center",
+            justifyContent: "space-between",
           }}
         >
-          <Pressable onPress={showDatePicker} style={{ width: 100 }}>
+          <View>
+            <Text style={{ fontSize: 17, fontWeight: "600", color: "white" }}>
+              {cart.length} items | Rs {total}
+            </Text>
             <Text
               style={{
-                borderColor: "gray",
-                borderRadius: 4,
-                borderWidth: 0.8,
-                marginVertical: 10,
-                color: "black",
-                textAlign: "center",
-                padding: 5,
-                fontSize: 17,
-                fontWeight: "bold",
+                fontSize: 15,
+                fontWeight: "400",
+                color: "white",
+                marginVertical: 6,
               }}
             >
-              Select Date
+              extra charges might apply
             </Text>
-          </Pressable>
-          <Pressable onPress={showPicker} style={{ width: 110 }}>
-            <Text
-              style={{
-                borderColor: "gray",
-                borderRadius: 4,
-                borderWidth: 0.8,
-                marginVertical: 10,
-                color: "black",
-                textAlign: "center",
-                padding: 5,
-                fontSize: 17,
-                fontWeight: "bold",
-              }}
-            >
-              Select Time
-            </Text>
-          </Pressable>
-        </View>
-
-        <Modal
-          visible={isDatePickerVisible}
-          animationType="slide"
-          transparent={true}
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "red",
-          }}
-        >
-          <View style={{ backgroundColor: "#fff", padding: 20 }}>
-            <TouchableOpacity onPress={() => setDatePickerVisibility(false)}>
-              <Text style={{ alignSelf: "flex-end", marginBottom: 10 }}>
-                Close
-              </Text>
-            </TouchableOpacity>
-            <Calendar
-              onDayPress={onDayPress}
-              markedDates={{
-                [selectedDate]: { selected: true },
-              }}
-              theme={{
-                calendarBackground: "#ffffff",
-                todayTextColor: "#007aff",
-                dayTextColor: "#2d4150",
-                textDisabledColor: "#d9e1e8",
-                selectedDayTextColor: "#ffffff",
-                selectedDayBackgroundColor: "#007aff",
-                dotColor: "#007aff",
-                selectedDotColor: "#ffffff",
-                arrowColor: "#007aff",
-                monthTextColor: "#007aff",
-                textSectionTitleColor: "#007aff",
-              }}
-            />
           </View>
-        </Modal>
-        <DateTimePickerModal
-          isVisible={isPickerVisible}
-          mode="time"
-          onConfirm={handleConfirm}
-          onCancel={hidePicker}
-        />
-      </View>
-      <Text
-        style={{
-          fontSize: 15,
-          color: "#808080",
-          fontWeight: "bold",
-          textAlign: "center",
-          marginBottom: 15,
-        }}
-      >
-        Add to Bucket
-      </Text>
-      {/* Render all the Products */}
-      {product.map((item, index) => (
-        <DressItem item={item} key={index} />
-      ))}
-    </ScrollView>
+
+          <Pressable onPress={() => navigation.navigate("PickUp")}>
+            <Text style={{ fontSize: 17, fontWeight: "600", color: "white" }}>
+              Proceed to pickup
+            </Text>
+          </Pressable>
+        </Pressable>
+      )}
+    </>
   );
 };
 
