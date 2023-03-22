@@ -13,20 +13,9 @@ import * as Location from "expo-location";
 import { MaterialIcons } from "@expo/vector-icons";
 import Carousel from "../components/Carousel";
 import Services from "../components/Services";
-import { useDispatch, useSelector } from "react-redux";
-import { getProducts } from "../ProductReducer";
 import { useNavigation } from "@react-navigation/native";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
 
 const HomeScreen = () => {
-  const cart = useSelector((state) => state.cart.cart);
-  const [items, setItems] = useState([]);
-  const total = cart
-    .map((item) => item.quantity * item.price)
-    .reduce((curr, prev) => curr + prev, 0);
-  const navigation = useNavigation();
-  console.log(cart);
   const [displayCurrentAddress, setdisplayCurrentAddress] = useState(
     "we are loading your location"
   );
@@ -85,29 +74,11 @@ const HomeScreen = () => {
       });
 
       for (let item of response) {
-        let address = `${item.streetNumber}, ${item.street},\n${item.city}, ${item.subregion} ${item.country}`;
+        let address = `${item.subregion} ${item.country}`;
         setdisplayCurrentAddress(address);
       }
     }
   };
-
-  const product = useSelector((state) => state.product.product);
-
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (product.length > 0) return;
-
-    const fetchProducts = async () => {
-      const colRef = collection(db, "types");
-      const docsSnap = await getDocs(colRef);
-      docsSnap.forEach((doc) => {
-        items.push(doc.data());
-      });
-      items?.map((service) => dispatch(getProducts(service)));
-    };
-    fetchProducts();
-  }, []);
 
   return (
     <>
@@ -160,43 +131,6 @@ const HomeScreen = () => {
         {/* Services Component */}
         <Services />
       </ScrollView>
-
-      {total === 0 ? null : (
-        <Pressable
-          style={{
-            backgroundColor: "#088F8F",
-            padding: 10,
-            marginBottom: 40,
-            margin: 15,
-            borderRadius: 7,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <View>
-            <Text style={{ fontSize: 17, fontWeight: "600", color: "white" }}>
-              {cart.length} items | $ {total}
-            </Text>
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: "400",
-                color: "white",
-                marginVertical: 6,
-              }}
-            >
-              extra charges might apply
-            </Text>
-          </View>
-
-          <Pressable onPress={() => navigation.navigate("PickUp")}>
-            <Text style={{ fontSize: 17, fontWeight: "600", color: "white" }}>
-              Proceed to pickup
-            </Text>
-          </Pressable>
-        </Pressable>
-      )}
     </>
   );
 };

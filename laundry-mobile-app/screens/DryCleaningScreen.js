@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Modal,
@@ -11,6 +11,8 @@ import {
 import DressItem from "../components/DressItem";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { useDispatch, useSelector } from "react-redux";
+import { getProducts } from "../ProductReducer";
 
 const services = [
   {
@@ -94,11 +96,32 @@ LocaleConfig.locales["en"] = {
 LocaleConfig.defaultLocale = "en";
 
 const DryCleaningScreen = () => {
+  const cart = useSelector((state) => state.cart.cart);
+  // console.log(cart);
   const [selectedDate, setSelectedDate] = useState("");
   const [isPickerVisible, setPickerVisibility] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [selectedTime, setSelectedTime] = useState(new Date());
+  //
+  const product = useSelector((state) => state.product.product);
+  console.log(product);
+  const dispatch = useDispatch();
+  //
+  useEffect(() => {
+    if (product.length > 0) return;
 
+    const fetchProducts = async () => {
+      // const colRef = collection(db, "types");
+      // const docsSnap = await getDocs(colRef);
+      // docsSnap.forEach((doc) => {
+      //   items.push(doc.data());
+      // });
+      services?.map((service) => dispatch(getProducts(service)));
+    };
+    fetchProducts();
+  }, []);
+
+  //
   const showPicker = () => {
     setPickerVisibility(true);
   };
@@ -129,7 +152,7 @@ const DryCleaningScreen = () => {
           marginTop: 20,
         }}
       >
-        <Text style={{ fontSize: 25, color: "#662d91", fontWeight: "bold" }}>
+        <Text style={{ fontSize: 25, color: "black", fontWeight: "bold" }}>
           Receive Your Time
         </Text>
       </View>
@@ -143,7 +166,7 @@ const DryCleaningScreen = () => {
         <Text
           style={{
             fontSize: 15,
-            color: "green",
+            color: "#808080",
             fontWeight: "bold",
             textAlign: "center",
             marginBottom: 15,
@@ -166,7 +189,7 @@ const DryCleaningScreen = () => {
                 borderRadius: 4,
                 borderWidth: 0.8,
                 marginVertical: 10,
-                color: "#088F8F",
+                color: "black",
                 textAlign: "center",
                 padding: 5,
                 fontSize: 17,
@@ -183,7 +206,7 @@ const DryCleaningScreen = () => {
                 borderRadius: 4,
                 borderWidth: 0.8,
                 marginVertical: 10,
-                color: "#088F8F",
+                color: "black",
                 textAlign: "center",
                 padding: 5,
                 fontSize: 17,
@@ -242,7 +265,7 @@ const DryCleaningScreen = () => {
       <Text
         style={{
           fontSize: 15,
-          color: "green",
+          color: "#808080",
           fontWeight: "bold",
           textAlign: "center",
           marginBottom: 15,
@@ -251,7 +274,7 @@ const DryCleaningScreen = () => {
         Add to Bucket
       </Text>
       {/* Render all the Products */}
-      {services.map((item, index) => (
+      {product.map((item, index) => (
         <DressItem item={item} key={index} />
       ))}
     </ScrollView>
