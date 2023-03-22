@@ -9,9 +9,8 @@ const firebaseConfig = {
   storageBucket: "laundry-app-22ab6.appspot.com",
   messagingSenderId: "458987403208",
   appId: "1:458987403208:web:10d90f2bd218d9a1bdf2fd",
-  measurementId: "G-QN5STYVTWC"
+  measurementId: "G-QN5STYVTWC",
 };
-
 
 const app = initializeApp(firebaseConfig);
 
