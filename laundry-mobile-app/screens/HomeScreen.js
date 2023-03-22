@@ -22,10 +22,14 @@ import { db } from "../firebase";
 const HomeScreen = () => {
   const cart = useSelector((state) => state.cart.cart);
   const [items, setItems] = useState([]);
-  const total = cart.map((item) => item.quantity * item.price).reduce((curr, prev) => curr + prev, 0);
+  const total = cart
+    .map((item) => item.quantity * item.price)
+    .reduce((curr, prev) => curr + prev, 0);
   const navigation = useNavigation();
   console.log(cart);
-  const [displayCurrentAddress, setdisplayCurrentAddress] = useState("we are loading your location");
+  const [displayCurrentAddress, setdisplayCurrentAddress] = useState(
+    "we are loading your location"
+  );
   const [locationServicesEnabled, setlocationServicesEnabled] = useState(false);
 
   useEffect(() => {
@@ -120,7 +124,10 @@ const HomeScreen = () => {
             <Text>{displayCurrentAddress}</Text>
           </View>
 
-          <Pressable onPress={() => navigation.navigate("Profile")} style={{ marginLeft: "auto", marginRight: 7 }}>
+          <Pressable
+            onPress={() => navigation.navigate("Profile")}
+            style={{ marginLeft: "auto", marginRight: 7 }}
+          >
             <Image
               style={{ width: 40, height: 40, borderRadius: 20 }}
               source={{
@@ -154,9 +161,7 @@ const HomeScreen = () => {
         <Services />
       </ScrollView>
 
-      {total === 0 ? (
-        null
-      ) : (
+      {total === 0 ? null : (
         <Pressable
           style={{
             backgroundColor: "#088F8F",
@@ -170,16 +175,28 @@ const HomeScreen = () => {
           }}
         >
           <View>
-            <Text style={{ fontSize: 17, fontWeight: "600", color: "white" }}>{cart.length} items |  $ {total}</Text>
-            <Text style={{ fontSize: 15, fontWeight: "400", color: "white", marginVertical: 6 }}>extra charges might apply</Text>
+            <Text style={{ fontSize: 17, fontWeight: "600", color: "white" }}>
+              {cart.length} items | $ {total}
+            </Text>
+            <Text
+              style={{
+                fontSize: 15,
+                fontWeight: "400",
+                color: "white",
+                marginVertical: 6,
+              }}
+            >
+              extra charges might apply
+            </Text>
           </View>
 
           <Pressable onPress={() => navigation.navigate("PickUp")}>
-            <Text style={{ fontSize: 17, fontWeight: "600", color: "white" }}>Proceed to pickup</Text>
+            <Text style={{ fontSize: 17, fontWeight: "600", color: "white" }}>
+              Proceed to pickup
+            </Text>
           </Pressable>
         </Pressable>
       )}
-
     </>
   );
 };
