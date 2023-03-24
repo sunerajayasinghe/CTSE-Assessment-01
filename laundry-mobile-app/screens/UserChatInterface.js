@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
-import { db } from "../firebase";
+import { db, auth } from "../firebase";
 import {
   addDoc,
   collection,
