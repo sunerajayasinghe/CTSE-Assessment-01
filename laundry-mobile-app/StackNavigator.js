@@ -6,6 +6,9 @@ import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import DryCleaningScreen from "./screens/DryCleaningScreen";
+import ChatScreen from './screens/ChatScreen';
+import ChatInterface from './screens/ChatInterface';
+import UserChatInterface from './screens/UserChatInterface';
 
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -38,6 +41,9 @@ const StackNavigator = () => {
           component={DryCleaningScreen}
           // options={{ headerShown: false }}
         />
+        <Stack.Screen name="Chat" component={ChatScreen} options={{headerShown:false}}/>
+        <Stack.Screen name="ChatInterface" component={ChatInterface} options={{headerShown:false}}/>
+        <Stack.Screen name="UserChatInterface" component={UserChatInterface} options={{headerShown:false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

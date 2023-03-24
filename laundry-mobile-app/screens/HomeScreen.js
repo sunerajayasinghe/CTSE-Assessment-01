@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getProducts } from "../ProductReducer";
 import { useNavigation } from "@react-navigation/native";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
+import { db, auth } from "../firebase";
 
 const HomeScreen = () => {
   const cart = useSelector((state) => state.cart.cart);
@@ -159,6 +159,22 @@ const HomeScreen = () => {
 
         {/* Services Component */}
         <Services />
+        <Pressable
+          onPress={() => {
+            if(auth.currentUser.email === "vihangapramudith0@gmail.com"){
+              navigation.navigate("Chat")
+            }else{
+              navigation.navigate("UserChatInterface")
+            }}}
+          style={{ marginLeft: "auto", marginRight: 20 }}
+        >
+          <Image
+            style={{ width: 40, height: 40, borderRadius: 20 }}
+            source={{
+              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREUKCdhJI24euYre5ltBbyO7J_8Ecfq8IT0Q&usqp=CAU",
+            }}
+          />
+        </Pressable>
       </ScrollView>
 
       {total === 0 ? null : (

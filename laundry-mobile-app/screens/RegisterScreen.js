@@ -1,21 +1,24 @@
 import {
+  StyleSheet,
   Text,
   View,
   Pressable,
   TextInput,
   SafeAreaView,
   KeyboardAvoidingView,
-  Alert
+  Alert,
 } from "react-native";
-import { Feather } from '@expo/vector-icons';
+import { Feather } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
 const RegisterScreen = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
@@ -28,24 +31,27 @@ const RegisterScreen = () => {
         [
           {
             text: "Cancel",
-            style: "cancel"
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
           },
-          { text: "OK" }
+          { text: "OK", onPress: () => console.log("OK Pressed") },
         ],
         { cancelable: false }
       );
     }
-    createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
-      console.log("user credentials", userCredential);
-      const user = userCredential._tokenResponse.email;
-      const myUserUid = auth.currentUser.uid;
+    createUserWithEmailAndPassword(auth, email, password).then(
+      (userCredential) => {
+        const user = userCredential._tokenResponse.email;
+        const myUserUid = auth.currentUser.uid;
 
-      setDoc(doc(db, "users", `${myUserUid}`), {
-        email: user,
-        phone: phone
-      })
-    })
-  }
+        setDoc(doc(db, "users", `${myUserUid}`), {
+          email: user,
+          phone: phone,
+          name: name,
+        });
+      }
+    );
+  };
   return (
     <SafeAreaView
       style={{
@@ -74,6 +80,23 @@ const RegisterScreen = () => {
 
         <View style={{ marginTop: 50 }}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <AntDesign name="user" size={24} color="black" />
+            <TextInput
+              placeholder="Name"
+              value={name}
+              onChangeText={(text) => setName(text)}
+              placeholderTextColor="black"
+              style={{
+                fontSize: email ? 18 : 18,
+                borderBottomWidth: 1,
+                borderBottomColor: "gray",
+                marginLeft: 13,
+                width: 300,
+                marginVertical: 10,
+              }}
+            />
+          </View>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <MaterialCommunityIcons
               name="email-outline"
               size={24}
@@ -90,7 +113,7 @@ const RegisterScreen = () => {
                 borderBottomColor: "gray",
                 marginLeft: 13,
                 width: 300,
-                marginVertical: 10,
+                marginVertical: 20,
               }}
             />
           </View>
@@ -149,7 +172,10 @@ const RegisterScreen = () => {
             </Text>
           </Pressable>
 
-          <Pressable onPress={() => navigation.goBack()} style={{ marginTop: 20 }}>
+          <Pressable
+            onPress={() => navigation.goBack()}
+            style={{ marginTop: 20 }}
+          >
             <Text
               style={{
                 textAlign: "center",
@@ -168,3 +194,5 @@ const RegisterScreen = () => {
 };
 
 export default RegisterScreen;
+
+const styles = StyleSheet.create({});
