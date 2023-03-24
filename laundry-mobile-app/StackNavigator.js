@@ -39,17 +39,17 @@ const StackNavigator = () => {
         <Stack.Screen
           name="DryClean"
           component={DryCleaningScreen}
-          // options={{ headerShown: false }}
+          options={{ headerShown: true }}
         />
         <Stack.Screen
           name="PickUp"
           component={PickUpScreen}
-          options={{ headerShown: false }}
+          options={{ headerShown: true }}
         />
         <Stack.Screen
           name="Cart"
           component={CartScreen}
-          options={{ headerShown: false }}
+          options={{ headerShown: true }}
         />
         <Stack.Screen
           name="Order"

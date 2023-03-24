@@ -14,8 +14,10 @@ import { MaterialIcons } from "@expo/vector-icons";
 import Carousel from "../components/Carousel";
 import Services from "../components/Services";
 import { useNavigation } from "@react-navigation/native";
+import ReviewScreen from "./ReviewScreen";
 
 const HomeScreen = () => {
+  const navigation = useNavigation();
   const [displayCurrentAddress, setdisplayCurrentAddress] = useState(
     "we are loading your location"
   );
@@ -130,6 +132,10 @@ const HomeScreen = () => {
 
         {/* Services Component */}
         <Services />
+        <View style={{ padding: 10 }}>
+          <Text style={{ fontSize: 18, fontWeight: "600" }}>Reviews</Text>
+          <ReviewScreen />
+        </View>
       </ScrollView>
     </>
   );
