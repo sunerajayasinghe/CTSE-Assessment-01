@@ -1,23 +1,16 @@
-import {
-  Text,
-  View,
-  SafeAreaView,
-  KeyboardAvoidingView,
-  TextInput,
-  Pressable,
-  ActivityIndicator
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Text, View, SafeAreaView, KeyboardAvoidingView, TextInput, Pressable, ActivityIndicator, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { auth } from "../firebase";
+
 const LoginScreen = () => {
+  const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState("");
-  const navigation = useNavigation();
 
   useEffect(() => {
     setLoading(true);
@@ -31,15 +24,20 @@ const LoginScreen = () => {
     });
 
     return unsubscribe;
-  }, [])
+  }, []);
 
   const login = () => {
     signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
       console.log("user credentials", userCredential);
       const user = userCredential.user;
       console.log("user details", user)
-    })
-  }
+    }).catch((error) => {
+      console.log(error.message);
+      Alert.alert(
+        "Login Failed",
+        "Please enter valid credentials");
+    });
+  };
 
   return (
     <SafeAreaView
@@ -67,7 +65,6 @@ const LoginScreen = () => {
             <Text style={{ fontSize: 20, color: "#662d91", fontWeight: "bold" }}>
               Sign In
             </Text>
-
             <Text style={{ fontSize: 18, marginTop: 8, fontWeight: "600" }}>
               Sign In to your account
             </Text>

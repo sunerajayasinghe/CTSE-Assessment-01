@@ -1,25 +1,19 @@
-import {
-  Text,
-  View,
-  Pressable,
-  TextInput,
-  SafeAreaView,
-  KeyboardAvoidingView,
-  Alert
-} from "react-native";
-import { Feather } from '@expo/vector-icons';
-import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Text, View, Pressable, TextInput, SafeAreaView, KeyboardAvoidingView, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import { Feather } from '@expo/vector-icons';
+import { auth, db } from "../firebase";
+
 const RegisterScreen = () => {
+  const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
-  const navigation = useNavigation();
+
   const register = () => {
     if (email === "" || password === "" || phone === "") {
       Alert.alert(
@@ -34,7 +28,8 @@ const RegisterScreen = () => {
         ],
         { cancelable: false }
       );
-    }
+    };
+
     createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
       console.log("user credentials", userCredential);
       const user = userCredential._tokenResponse.email;
@@ -43,9 +38,15 @@ const RegisterScreen = () => {
       setDoc(doc(db, "users", `${myUserUid}`), {
         email: user,
         phone: phone
-      })
-    })
-  }
+      });
+    }).catch((error) => {
+      console.log(error.message);
+      Alert.alert(
+        "Signup Failed",
+        "Please enter valid credentials");
+    });
+  };
+
   return (
     <SafeAreaView
       style={{
@@ -66,7 +67,6 @@ const RegisterScreen = () => {
           <Text style={{ fontSize: 20, color: "#662d91", fontWeight: "bold" }}>
             Register
           </Text>
-
           <Text style={{ fontSize: 18, marginTop: 8, fontWeight: "600" }}>
             Create a new Account
           </Text>
