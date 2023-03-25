@@ -61,7 +61,7 @@ const ReviewScreen = () => {
       setIsModalVisible(false);
     }
   };
-  //
+  //update a review
   const updateReview = async (id, newText) => {
     try {
       const reviewRef = doc(db, "reviews", id);
