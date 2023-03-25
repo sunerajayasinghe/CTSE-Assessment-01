@@ -20,6 +20,7 @@ import Modal from "react-native-modal";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const ReviewScreen = () => {
+  //adding state variables
   const [review, setReview] = useState("");
   const [reviews, setReviews] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
