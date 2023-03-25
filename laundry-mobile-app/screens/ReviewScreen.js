@@ -17,6 +17,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import Modal from "react-native-modal";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const ReviewScreen = () => {
   const [review, setReview] = useState("");
@@ -72,6 +73,7 @@ const ReviewScreen = () => {
       const reviewRef = doc(db, "reviews", id);
       await deleteDoc(reviewRef);
       loadReviews();
+      alert("review deleted successfully");
     } catch (error) {
       console.error("Error deleting review: ", error);
     }
@@ -82,30 +84,57 @@ const ReviewScreen = () => {
       <View style={styles.review}>
         <Text style={styles.reviewText}>{item.text}</Text>
         <View style={styles.buttonsContainer}>
-          <Button title="Edit" onPress={() => setIsModalVisible(true)} />
           <Modal isVisible={isModalVisible}>
             <View style={styles.modalContent}>
               <TextInput
-                placeholder="Enter new text..."
+                placeholder="Enter new review..."
                 value={newText}
                 onChangeText={(text) => setNewText(text)}
                 keyboardType="default"
+                style={styles.textInput}
               />
-              <Button title="Cancel" onPress={() => setIsModalVisible(false)} />
-              <Button
-                title="Submit"
-                onPress={() => {
-                  handleSubmit(item.id);
-                }}
-              />
+              <View style={styles.buttonContainer}>
+                <Button
+                  title="Cancel"
+                  onPress={() => setIsModalVisible(false)}
+                  color="#999999"
+                  style={styles.button}
+                />
+                <Button
+                  title="Submit"
+                  onPress={() => {
+                    handleSubmit(item.id);
+                  }}
+                  color="#007AFF"
+                  style={styles.button}
+                />
+              </View>
             </View>
           </Modal>
-          <Button
-            title="Delete"
-            onPress={() => {
-              deleteReview(item.id);
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "flex-end",
+              marginTop: 10,
+              marginLeft: 250,
             }}
-          />
+          >
+            <MaterialIcons
+              name="edit"
+              size={24}
+              color="green"
+              onPress={() => setIsModalVisible(true)}
+            />
+            <MaterialIcons
+              name="delete"
+              size={24}
+              color="red"
+              style={{ marginRight: 10 }}
+              onPress={() => {
+                deleteReview(item.id);
+              }}
+            />
+          </View>
         </View>
       </View>
     );
@@ -113,14 +142,14 @@ const ReviewScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Reviews</Text>
       <TextInput
         style={styles.input}
         value={review}
         onChangeText={(text) => setReview(text)}
         placeholder="Enter a review"
       />
-      <Button title="Add" onPress={addReview} />
+      <Button title="Add" onPress={addReview} color="#007AFF" />
+      <Text style={{ marginTop: 20, fontSize: 20 }}>My Reviews🖋️</Text>
       <FlatList
         style={styles.reviewsList}
         data={reviews}
@@ -134,30 +163,30 @@ const ReviewScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#F5F5F5",
     padding: 20,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
   input: {
-    height: 40,
     borderWidth: 1,
-    borderColor: "#ccc",
-    paddingHorizontal: 10,
+    borderColor: "#CCCCCC",
+    borderRadius: 5,
+    padding: 10,
     marginBottom: 10,
+    backgroundColor: "#FFFFFF",
+  },
+  reviewsList: {
+    marginTop: 20,
   },
   review: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#CCCCCC",
+    borderRadius: 5,
     padding: 10,
-    borderRadius: 10,
     marginBottom: 10,
+    backgroundColor: "#FFFFFF",
   },
   reviewText: {
-    fontSize: 18,
-    marginBottom: 5,
+    fontSize: 16,
   },
   buttonsContainer: {
     flexDirection: "row",
@@ -165,12 +194,22 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: "white",
-    padding: 22,
-    justifyContent: "center",
-    // alignItems: "center",
-    borderRadius: 4,
-    borderColor: "rgba(0, 0, 0, 0.1)",
-    margin: 15,
+    padding: 20,
+    borderRadius: 10,
+  },
+  textInput: {
+    backgroundColor: "#F5F5F5",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: 10,
+  },
+  button: {
+    marginLeft: 10,
   },
 });
 
