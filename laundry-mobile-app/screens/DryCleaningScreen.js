@@ -5,70 +5,73 @@ import {
   View,
   Pressable,
   Image,
-  FlatList,
   StyleSheet,
+  TextInput,
+  Button,
 } from "react-native";
 import DressItem from "../components/DressItem";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { getProducts } from "../ProductReducer";
 import { db } from "../firebase";
-import { collection, getDocs } from "firebase/firestore";
-// const services = [
-//   {
-//     id: "0",
-//     image: "https://cdn-icons-png.flaticon.com/128/4643/4643574.png",
-//     name: "shirt",
-//     quantity: 0,
-//     price: 10,
-//   },
-//   {
-//     id: "11",
-//     image: "https://cdn-icons-png.flaticon.com/512/5638/5638937.png",
-//     name: "Saree",
-//     quantity: 0,
-//     price: 10,
-//   },
-//   {
-//     id: "12",
-//     image: "https://cdn-icons-png.flaticon.com/128/9609/9609161.png",
-//     name: "dresses",
-//     quantity: 0,
-//     price: 10,
-//   },
-//   {
-//     id: "13",
-//     image: "https://cdn-icons-png.flaticon.com/128/599/599388.png",
-//     name: "jeans",
-//     quantity: 0,
-//     price: 10,
-//   },
-//   {
-//     id: "14",
-//     image: "https://cdn-icons-png.flaticon.com/128/9431/9431166.png",
-//     name: "Sweater",
-//     quantity: 0,
-//     price: 10,
-//   },
-// ];
-
+import {
+  collection,
+  doc,
+  getDocs,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
+import { MaterialIcons } from "@expo/vector-icons";
+import Modal from "react-native-modal";
+//
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
+    // backgroundColor: "#fff",
     padding: 20,
+    width: 300,
   },
   orders: {
     fontSize: 16,
     lineHeight: 24,
     marginBottom: 10,
+    padding: 15,
+    backgroundColor: "white",
+    borderRadius: 10,
+  },
+  pickupDetails: {
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+  },
+  textInput: {
+    backgroundColor: "#F5F5F5",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: 10,
+  },
+  button: {
+    marginLeft: 10,
   },
 });
-
+//
 const DryCleaningScreen = () => {
   const cart = useSelector((state) => state.cart.cart);
   const navigation = useNavigation();
   const [items, setItems] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [newText, setNewText] = useState("");
   //
   const total = cart
     .map((item) => item.quantity * item.price)
@@ -92,17 +95,48 @@ const DryCleaningScreen = () => {
     fetchProducts();
   }, []);
   //
+  const loadOrders = async () => {
+    const orderRef = collection(db, "orders");
+    const orderSnapshot = await getDocs(orderRef);
+    const orderList = orderSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setOrders(orderList);
+  };
+  //
   useEffect(() => {
-    const fetchOrders = async () => {
-      const colRef = collection(db, "users");
-      const docsSnap = await getDocs(colRef);
-      docsSnap.forEach((doc) => {
-        orders.push(doc.data());
-      });
-    };
-    fetchOrders();
+    loadOrders();
   }, []);
   //
+  const deleteOrder = async (id) => {
+    try {
+      const orderRef = doc(db, "orders", id);
+      await deleteDoc(orderRef);
+      alert("Orders deleted");
+      loadOrders();
+    } catch (error) {
+      console.error("Error deleting order: ", error);
+    }
+  };
+  //
+  const handleSubmit = (id) => {
+    if (newText !== "") {
+      updateOrder(id, newText);
+      setNewText("");
+      setIsModalVisible(false);
+    }
+  };
+  //
+  const updateOrder = async (id, newText) => {
+    try {
+      const orderRef = doc(db, "orders", id);
+      await updateDoc(orderRef, { "orders.0.quantity": newText });
+      loadOrders();
+    } catch (error) {
+      console.error("Error updating review: ", error);
+    }
+  };
   return (
     <>
       <ScrollView style={{ backgroundColor: "#F0F0F0", flex: 1, marginTop: 5 }}>
@@ -141,25 +175,98 @@ const DryCleaningScreen = () => {
           </Text>
           {orders?.map((order, index) => {
             const { orders, pickUpDetails } = order;
-            return order.email === "user@gmail.com" ? (
-              <View style={styles.container}>
-                <Text style={styles.orders}>
-                  {Object.values(orders).map((order) => (
-                    <Text key={order.id}>
-                      Order ID: {order.id}
-                      {"\n"}- {order.name}: {order.quantity} x {order.price} ={" "}
-                      {order.quantity * order.price}
-                      {"\n"}
-                    </Text>
+            return (
+              <View style={styles.container} key={index}>
+                <View style={styles.orders}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "flex-end",
+                      marginTop: 1,
+                      marginBottom: 30,
+                    }}
+                  >
+                    <MaterialIcons
+                      name="delete"
+                      size={24}
+                      color="red"
+                      style={{ marginRight: 10 }}
+                      onPress={() => {
+                        deleteOrder(order.id);
+                      }}
+                    />
+                    <MaterialIcons
+                      name="edit"
+                      size={24}
+                      color="green"
+                      onPress={() => setIsModalVisible(true)}
+                    />
+                  </View>
+                  <Modal isVisible={isModalVisible}>
+                    <View style={styles.modalContent}>
+                      <TextInput
+                        placeholder="Enter new quantity..."
+                        value={newText}
+                        onChangeText={(text) => setNewText(text)}
+                        keyboardType="numeric"
+                        style={styles.textInput}
+                      />
+                      <View style={styles.buttonContainer}>
+                        <Button
+                          title="Cancel"
+                          onPress={() => setIsModalVisible(false)}
+                          color="#999999"
+                          style={styles.button}
+                        />
+                        <Button
+                          title="Submit"
+                          onPress={() => {
+                            handleSubmit(order.id);
+                          }}
+                          color="#007AFF"
+                          style={styles.button}
+                        />
+                      </View>
+                    </View>
+                  </Modal>
+                  {Object?.values(orders)?.map((order) => (
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginBottom: 10,
+                      }}
+                    >
+                      <Image
+                        style={{ width: 50, height: 50 }}
+                        source={{ uri: order?.image }}
+                      />
+                      <Text
+                        key={order.id}
+                        style={{
+                          marginLeft: 10,
+                        }}
+                      >
+                        Order ID: {order.id} {"\n"}- {order.name}:{" "}
+                        {order.quantity} x {order.price} ={" "}
+                        {order.quantity * order.price} {"\n"}
+                      </Text>
+                    </View>
                   ))}
-                  {"\n"}
-                  Pick Up Details:{"\n"}- No. of days:{" "}
-                  {pickUpDetails.no_Of_days}
-                  {"\n"}- Selected Time: {pickUpDetails.selectedTime}
-                  {"\n"}
-                </Text>
+                  <Text style={styles.pickupDetails}>
+                    {"\n"}
+                    Pick Up Details:
+                  </Text>
+                  <Text style={{ marginLeft: 12 }}>
+                    {"\n"}📆 No. of days: {pickUpDetails.no_Of_days}
+                    {"\n"}
+                    {"\n"}⌚ Selected Time: {pickUpDetails.selectedTime}
+                    {"\n"}
+                  </Text>
+                </View>
               </View>
-            ) : null;
+            );
           })}
         </View>
       </ScrollView>

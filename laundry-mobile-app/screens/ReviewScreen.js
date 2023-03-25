@@ -50,7 +50,6 @@ const ReviewScreen = () => {
   };
   //
   const handleSubmit = (id) => {
-    console.log(id);
     if (newText !== "") {
       updateReview(id, newText);
       setNewText("");

@@ -1,11 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  SafeAreaView,
-  ScrollView,
-  Pressable,
-} from "react-native";
+import { StyleSheet, Text, View, ScrollView, Pressable } from "react-native";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,7 +9,7 @@ import {
   incrementQuantity,
 } from "../CartReducer";
 import { decrementQty, incrementQty } from "../ProductReducer";
-import { doc, setDoc } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
 const CartScreen = () => {
@@ -28,20 +21,21 @@ const CartScreen = () => {
   const navigation = useNavigation();
   const userUid = auth.currentUser.uid;
   const dispatch = useDispatch();
+  //
   const placeOrder = async () => {
     navigation.navigate("Order");
     dispatch(cleanCart());
-    await setDoc(
-      doc(db, "users", `${userUid}`),
-      {
+    try {
+      const ordersRef = collection(db, "orders");
+      await addDoc(ordersRef, {
         orders: { ...cart },
         pickUpDetails: route.params,
-      },
-      {
-        merge: true,
-      }
-    );
+      });
+    } catch (error) {
+      console.error("Error adding order: ", error);
+    }
   };
+  //
   return (
     <>
       <ScrollView style={{ marginTop: 50 }}>
