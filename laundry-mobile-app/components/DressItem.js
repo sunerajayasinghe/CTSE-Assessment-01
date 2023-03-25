@@ -9,6 +9,7 @@ import {
 import { decrementQty, incrementQty } from "../ProductReducer";
 
 const DressItem = ({ item }) => {
+  // console.log(item);
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.cart);
   const addItemToCart = () => {
@@ -47,7 +48,7 @@ const DressItem = ({ item }) => {
             {item.name}
           </Text>
           <Text style={{ width: 60, color: "gray", fontSize: 15 }}>
-            ${item.price}
+            Rs{item.price}
           </Text>
         </View>
 

@@ -1,260 +1,312 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Button,
-  Modal,
-  TouchableOpacity,
   ScrollView,
   Text,
   View,
   Pressable,
+  Image,
+  StyleSheet,
+  TextInput,
+  Button,
 } from "react-native";
 import DressItem from "../components/DressItem";
-import { Calendar, LocaleConfig } from "react-native-calendars";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-
-const services = [
-  {
-    id: "0",
-    image: "https://cdn-icons-png.flaticon.com/128/4643/4643574.png",
-    name: "shirt",
-    quantity: 0,
-    price: 10,
+import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import { getProducts } from "../ProductReducer";
+import { db } from "../firebase";
+import {
+  collection,
+  doc,
+  getDocs,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
+import { MaterialIcons } from "@expo/vector-icons";
+import Modal from "react-native-modal";
+//
+const styles = StyleSheet.create({
+  container: {
+    // backgroundColor: "#fff",
+    padding: 20,
+    width: 300,
   },
-  {
-    id: "11",
-    image: "https://cdn-icons-png.flaticon.com/512/5638/5638937.png",
-    name: "Saree",
-    quantity: 0,
-    price: 10,
+  orders: {
+    fontSize: 16,
+    lineHeight: 24,
+    marginBottom: 10,
+    padding: 15,
+    backgroundColor: "white",
+    borderRadius: 10,
   },
-  {
-    id: "12",
-    image: "https://cdn-icons-png.flaticon.com/128/9609/9609161.png",
-    name: "dresses",
-    quantity: 0,
-    price: 10,
+  pickupDetails: {
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
   },
-  {
-    id: "13",
-    image: "https://cdn-icons-png.flaticon.com/128/599/599388.png",
-    name: "jeans",
-    quantity: 0,
-    price: 10,
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
   },
-  {
-    id: "14",
-    image: "https://cdn-icons-png.flaticon.com/128/9431/9431166.png",
-    name: "Sweater",
-    quantity: 0,
-    price: 10,
+  textInput: {
+    backgroundColor: "#F5F5F5",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
   },
-];
-
-LocaleConfig.locales["en"] = {
-  monthNames: [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ],
-  monthNamesShort: [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ],
-  dayNames: [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ],
-  dayNamesShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-};
-
-LocaleConfig.defaultLocale = "en";
-
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: 10,
+  },
+  button: {
+    marginLeft: 10,
+  },
+});
+//
 const DryCleaningScreen = () => {
-  const [selectedDate, setSelectedDate] = useState("");
-  const [isPickerVisible, setPickerVisibility] = useState(false);
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [selectedTime, setSelectedTime] = useState(new Date());
+  const cart = useSelector((state) => state.cart.cart);
+  const navigation = useNavigation();
+  const [items, setItems] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [newText, setNewText] = useState("");
+  //
+  const total = cart
+    .map((item) => item.quantity * item.price)
+    .reduce((curr, prev) => curr + prev, 0);
+  //
+  const product = useSelector((state) => state.product.product);
+  const dispatch = useDispatch();
+  //
+  useEffect(() => {
+    if (product.length > 0) return;
 
-  const showPicker = () => {
-    setPickerVisibility(true);
+    const fetchProducts = async () => {
+      //get data from firebase
+      const colRef = collection(db, "types");
+      const docsSnap = await getDocs(colRef);
+      docsSnap.forEach((doc) => {
+        items.push(doc.data());
+      });
+      items?.map((service) => dispatch(getProducts(service)));
+    };
+    fetchProducts();
+  }, []);
+  //
+  const loadOrders = async () => {
+    const orderRef = collection(db, "orders");
+    const orderSnapshot = await getDocs(orderRef);
+    const orderList = orderSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setOrders(orderList);
   };
   //
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
+  useEffect(() => {
+    loadOrders();
+  }, []);
+  //
+  const deleteOrder = async (id) => {
+    try {
+      const orderRef = doc(db, "orders", id);
+      await deleteDoc(orderRef);
+      alert("Orders deleted");
+      loadOrders();
+    } catch (error) {
+      console.error("Error deleting order: ", error);
+    }
   };
   //
-  const hidePicker = () => {
-    setPickerVisibility(false);
+  const handleSubmit = (id) => {
+    if (newText !== "") {
+      updateOrder(id, newText);
+      setNewText("");
+      setIsModalVisible(false);
+    }
   };
   //
-  const handleConfirm = (time) => {
-    setSelectedTime(time);
-    hidePicker();
+  const updateOrder = async (id, newText) => {
+    try {
+      const orderRef = doc(db, "orders", id);
+      await updateDoc(orderRef, { "orders.0.quantity": newText });
+      loadOrders();
+    } catch (error) {
+      console.error("Error updating review: ", error);
+    }
   };
-  //
-  const onDayPress = (day) => {
-    setSelectedDate(day.dateString);
-  };
-
   return (
-    <ScrollView style={{ backgroundColor: "#F0F0F0", flex: 1, marginTop: 5 }}>
-      <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          marginTop: 20,
-        }}
-      >
-        <Text style={{ fontSize: 25, color: "#662d91", fontWeight: "bold" }}>
-          Receive Your Time
-        </Text>
-      </View>
-
-      <View
-        style={{
-          padding: 30,
-          marginTop: 0,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 15,
-            color: "green",
-            fontWeight: "bold",
-            textAlign: "center",
-            marginBottom: 15,
-          }}
-        >
-          Select a date & Time
-        </Text>
-        {/* ///////////// */}
+    <>
+      <ScrollView style={{ backgroundColor: "#F0F0F0", flex: 1, marginTop: 5 }}>
         <View
           style={{
-            flexDirection: "row",
-            justifyContent: "space-around",
+            justifyContent: "center",
             alignItems: "center",
+            marginTop: 20,
           }}
         >
-          <Pressable onPress={showDatePicker} style={{ width: 100 }}>
-            <Text
-              style={{
-                borderColor: "gray",
-                borderRadius: 4,
-                borderWidth: 0.8,
-                marginVertical: 10,
-                color: "#088F8F",
-                textAlign: "center",
-                padding: 5,
-                fontSize: 17,
-                fontWeight: "bold",
-              }}
-            >
-              Select Date
-            </Text>
-          </Pressable>
-          <Pressable onPress={showPicker} style={{ width: 110 }}>
-            <Text
-              style={{
-                borderColor: "gray",
-                borderRadius: 4,
-                borderWidth: 0.8,
-                marginVertical: 10,
-                color: "#088F8F",
-                textAlign: "center",
-                padding: 5,
-                fontSize: 17,
-                fontWeight: "bold",
-              }}
-            >
-              Select Time
-            </Text>
-          </Pressable>
+          <Text style={{ fontSize: 25, color: "black", fontWeight: "bold" }}>
+            Receive Your Time
+          </Text>
         </View>
 
-        <Modal
-          visible={isDatePickerVisible}
-          animationType="slide"
-          transparent={true}
+        {/* Render all the Products */}
+        {product.map((item, index) => (
+          <DressItem item={item} key={index} />
+        ))}
+        <View
           style={{
-            alignItems: "center",
             justifyContent: "center",
-            backgroundColor: "red",
+            alignItems: "center",
+            marginTop: 20,
           }}
         >
-          <View style={{ backgroundColor: "#fff", padding: 20 }}>
-            <TouchableOpacity onPress={() => setDatePickerVisibility(false)}>
-              <Text style={{ alignSelf: "flex-end", marginBottom: 10 }}>
-                Close
-              </Text>
-            </TouchableOpacity>
-            <Calendar
-              onDayPress={onDayPress}
-              markedDates={{
-                [selectedDate]: { selected: true },
+          <Text
+            style={{
+              fontSize: 25,
+              color: "black",
+              fontWeight: "bold",
+              marginBottom: 10,
+            }}
+          >
+            My Orders
+          </Text>
+          {orders?.map((order, index) => {
+            const { orders, pickUpDetails } = order;
+            return (
+              <View style={styles.container} key={index}>
+                <View style={styles.orders}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "flex-end",
+                      marginTop: 1,
+                      marginBottom: 30,
+                    }}
+                  >
+                    <MaterialIcons
+                      name="delete"
+                      size={24}
+                      color="red"
+                      style={{ marginRight: 10 }}
+                      onPress={() => {
+                        deleteOrder(order.id);
+                      }}
+                    />
+                    <MaterialIcons
+                      name="edit"
+                      size={24}
+                      color="green"
+                      onPress={() => setIsModalVisible(true)}
+                    />
+                  </View>
+                  <Modal isVisible={isModalVisible}>
+                    <View style={styles.modalContent}>
+                      <TextInput
+                        placeholder="Enter new quantity..."
+                        value={newText}
+                        onChangeText={(text) => setNewText(text)}
+                        keyboardType="numeric"
+                        style={styles.textInput}
+                      />
+                      <View style={styles.buttonContainer}>
+                        <Button
+                          title="Cancel"
+                          onPress={() => setIsModalVisible(false)}
+                          color="#999999"
+                          style={styles.button}
+                        />
+                        <Button
+                          title="Submit"
+                          onPress={() => {
+                            handleSubmit(order.id);
+                          }}
+                          color="#007AFF"
+                          style={styles.button}
+                        />
+                      </View>
+                    </View>
+                  </Modal>
+                  {Object?.values(orders)?.map((order) => (
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginBottom: 10,
+                      }}
+                    >
+                      <Image
+                        style={{ width: 50, height: 50 }}
+                        source={{ uri: order?.image }}
+                      />
+                      <Text
+                        key={order.id}
+                        style={{
+                          marginLeft: 10,
+                        }}
+                      >
+                        Order ID: {order.id} {"\n"}- {order.name}:{" "}
+                        {order.quantity} x {order.price} ={" "}
+                        {order.quantity * order.price} {"\n"}
+                      </Text>
+                    </View>
+                  ))}
+                  <Text style={styles.pickupDetails}>
+                    {"\n"}
+                    Pick Up Details:
+                  </Text>
+                  <Text style={{ marginLeft: 12 }}>
+                    {"\n"}📆 No. of days: {pickUpDetails.no_Of_days}
+                    {"\n"}
+                    {"\n"}⌚ Selected Time: {pickUpDetails.selectedTime}
+                    {"\n"}
+                  </Text>
+                </View>
+              </View>
+            );
+          })}
+        </View>
+      </ScrollView>
+      {total === 0 ? null : (
+        <Pressable
+          style={{
+            backgroundColor: "#088F8F",
+            padding: 10,
+            marginBottom: 40,
+            margin: 15,
+            borderRadius: 7,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <View>
+            <Text style={{ fontSize: 17, fontWeight: "600", color: "white" }}>
+              {cart.length} items | Rs {total}
+            </Text>
+            <Text
+              style={{
+                fontSize: 15,
+                fontWeight: "400",
+                color: "white",
+                marginVertical: 6,
               }}
-              theme={{
-                calendarBackground: "#ffffff",
-                todayTextColor: "#007aff",
-                dayTextColor: "#2d4150",
-                textDisabledColor: "#d9e1e8",
-                selectedDayTextColor: "#ffffff",
-                selectedDayBackgroundColor: "#007aff",
-                dotColor: "#007aff",
-                selectedDotColor: "#ffffff",
-                arrowColor: "#007aff",
-                monthTextColor: "#007aff",
-                textSectionTitleColor: "#007aff",
-              }}
-            />
+            >
+              extra charges might apply
+            </Text>
           </View>
-        </Modal>
-        <DateTimePickerModal
-          isVisible={isPickerVisible}
-          mode="time"
-          onConfirm={handleConfirm}
-          onCancel={hidePicker}
-        />
-      </View>
-      <Text
-        style={{
-          fontSize: 15,
-          color: "green",
-          fontWeight: "bold",
-          textAlign: "center",
-          marginBottom: 15,
-        }}
-      >
-        Add to Bucket
-      </Text>
-      {/* Render all the Products */}
-      {services.map((item, index) => (
-        <DressItem item={item} key={index} />
-      ))}
-    </ScrollView>
+
+          <Pressable onPress={() => navigation.navigate("PickUp")}>
+            <Text style={{ fontSize: 17, fontWeight: "600", color: "white" }}>
+              Proceed to pickup
+            </Text>
+          </Pressable>
+        </Pressable>
+      )}
+    </>
   );
 };
 

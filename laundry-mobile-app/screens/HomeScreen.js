@@ -5,6 +5,7 @@ import * as Location from "expo-location";
 import { MaterialIcons } from "@expo/vector-icons";
 import Carousel from "../components/Carousel";
 import Services from "../components/Services";
+import ReviewScreen from "./ReviewScreen";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -91,6 +92,10 @@ const HomeScreen = () => {
         {/* Services Component */}
         <Services />
 
+        <View style={{ padding: 10 }}>
+          <Text style={{ fontSize: 18, fontWeight: "600" }}>Reviews</Text>
+          <ReviewScreen />
+        </View>
       </ScrollView>
     </>
   );
