@@ -156,6 +156,7 @@ const ReviewScreen = () => {
       />
       <Button title="Add" onPress={addReview} color="#007AFF" />
       <Text style={{ marginTop: 20, fontSize: 20 }}>My Reviews🖋️</Text>
+      {/* get render component returen and display  */}
       <FlatList
         style={styles.reviewsList}
         data={reviews}
