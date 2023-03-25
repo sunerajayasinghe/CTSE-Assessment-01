@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { db } from "../firebase";
+import { FontAwesome } from "@expo/vector-icons";
 
 function ChatScreen() {
   const [users, setUsers] = useState([]);
@@ -36,28 +37,35 @@ function ChatScreen() {
       <TouchableOpacity
         onPress={() => navigation.navigate("ChatInterface", { item })}
       >
-        <Text style={{ fontSize: 18, fontWeight: "bold" }}>{item.name}</Text>
+        <View style={{ flexDirection: "row" }}>
+          <FontAwesome name="user-circle" size={24} color="black" />
+          <Text style={{ fontSize: 18, fontWeight: "bold", paddingLeft: 10 }}>
+            {item.name}
+          </Text>
+        </View>
       </TouchableOpacity>
     </View>
   );
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#dfede3" }}>
       <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Chat User List</Text>
-      </View>
-      <View style={{ backgroundColor: "#3275a8" }}>
-        {users.length > 0 && (
-          <View>
+        <View style={styles.header}>
+          <Text style={styles.title}>Chat User List</Text>
+        </View>
+        <View
+          style={{
+            backgroundColor: "#3275a8",
+          }}
+        >
+          {users.length > 0 && (
             <FlatList
               data={users}
               renderItem={renderItem}
               keyExtractor={(item) => item.id.toString()}
             />
-          </View>
-        )}
-      </View>
+          )}
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -67,19 +75,19 @@ export default ChatScreen;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#151617"',
+    backgroundColor: "#32a852",
   },
   header: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: "#ccc",
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   item: {
     backgroundColor: "#27b2f2",

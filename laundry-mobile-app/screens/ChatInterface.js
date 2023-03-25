@@ -129,7 +129,7 @@ function ChatInterface({ route }) {
                     fontSize: 22,
                   }}
                 >
-                  {item.message.toString()}
+                  {String(item.message)}
                   
                 </Text>
                 </View>
@@ -214,9 +214,9 @@ function ChatInterface({ route }) {
               >
                 <MaterialIcons
                   name="send"
-                  size={24}
+                  size={35}
                   color="#348feb"
-                  style={{ marginTop: -30, marginLeft: 380 }}
+                  style={{ marginTop: -37, marginLeft: 370 }}
                 />
               </TouchableOpacity>
             </View>
@@ -245,9 +245,9 @@ function ChatInterface({ route }) {
               >
                 <MaterialIcons
                   name="send"
-                  size={24}
+                  size={35}
                   color="#348feb"
-                  style={{ marginTop: -30, marginLeft: 380 }}
+                  style={{ marginTop: -37, marginLeft: 370 }}
                 />
               </TouchableOpacity>
             </View>

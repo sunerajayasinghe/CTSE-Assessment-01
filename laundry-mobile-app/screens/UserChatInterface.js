@@ -193,14 +193,14 @@ function UserChatInterface({ route }) {
               >
                 <MaterialIcons
                   name="send"
-                  size={24}
+                  size={35}
                   color="#348feb"
-                  style={{ marginTop: -30, marginLeft: 380 }}
+                  style={{ marginTop: -37, marginLeft: 370 }}
                 />
               </TouchableOpacity>
             </View>
           ) : (
-            <View>
+            <View style={{position: "absolute",marginTop: 360}}>
               <TextInput
                 style={{
                   marginTop: 100,
@@ -224,9 +224,9 @@ function UserChatInterface({ route }) {
               >
                 <MaterialIcons
                   name="send"
-                  size={24}
+                  size={35}
                   color="#348feb"
-                  style={{ marginTop: -30, marginLeft: 380 }}
+                  style={{ marginTop: -37, marginLeft: 370 }}
                 />
               </TouchableOpacity>
             </View>
