@@ -83,6 +83,7 @@ const ReviewScreen = () => {
     }
   };
 
+  //render review component
   const renderReview = ({ item }) => {
     return (
       <View style={styles.review}>
