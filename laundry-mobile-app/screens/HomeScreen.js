@@ -132,6 +132,7 @@ const HomeScreen = () => {
 
         {/* Services Component */}
         <Services />
+        {/* adding review screen to home  */}
         <View style={{ padding: 10 }}>
           <Text style={{ fontSize: 18, fontWeight: "600" }}>Reviews</Text>
           <ReviewScreen />
