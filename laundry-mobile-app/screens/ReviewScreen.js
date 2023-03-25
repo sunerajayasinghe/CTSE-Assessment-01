@@ -20,11 +20,13 @@ import Modal from "react-native-modal";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const ReviewScreen = () => {
+  //adding state variables
   const [review, setReview] = useState("");
   const [reviews, setReviews] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newText, setNewText] = useState("");
 
+  //load reviews form firebase
   const loadReviews = async () => {
     const reviewsRef = collection(db, "reviews");
     const reviewsSnapshot = await getDocs(reviewsRef);
@@ -35,10 +37,12 @@ const ReviewScreen = () => {
     setReviews(reviewsList);
   };
 
+  //
   useEffect(() => {
     loadReviews();
   }, []);
 
+  //add a new review to firebase
   const addReview = async () => {
     try {
       const reviewsRef = collection(db, "reviews");
@@ -49,7 +53,7 @@ const ReviewScreen = () => {
       console.error("Error adding review: ", error);
     }
   };
-  //
+  //handling the review submission
   const handleSubmit = (id) => {
     if (newText !== "") {
       updateReview(id, newText);
@@ -57,7 +61,7 @@ const ReviewScreen = () => {
       setIsModalVisible(false);
     }
   };
-  //
+  //update a review
   const updateReview = async (id, newText) => {
     try {
       const reviewRef = doc(db, "reviews", id);
@@ -67,7 +71,7 @@ const ReviewScreen = () => {
       console.error("Error updating review: ", error);
     }
   };
-  //
+  //delete review recored from firebase
   const deleteReview = async (id) => {
     try {
       const reviewRef = doc(db, "reviews", id);
@@ -79,11 +83,13 @@ const ReviewScreen = () => {
     }
   };
 
+  //render review component
   const renderReview = ({ item }) => {
     return (
       <View style={styles.review}>
         <Text style={styles.reviewText}>{item.text}</Text>
         <View style={styles.buttonsContainer}>
+          {/* modal for update review record  */}
           <Modal isVisible={isModalVisible}>
             <View style={styles.modalContent}>
               <TextInput
@@ -150,6 +156,7 @@ const ReviewScreen = () => {
       />
       <Button title="Add" onPress={addReview} color="#007AFF" />
       <Text style={{ marginTop: 20, fontSize: 20 }}>My Reviews🖋️</Text>
+      {/* get render component returen and display  */}
       <FlatList
         style={styles.reviewsList}
         data={reviews}
@@ -159,7 +166,7 @@ const ReviewScreen = () => {
     </View>
   );
 };
-
+//adding styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
