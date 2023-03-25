@@ -1,15 +1,17 @@
+import { Text, View, Pressable, TextInput, SafeAreaView, KeyboardAvoidingView, Alert, } from "react-native";
+import { Feather } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Text, View, Pressable, TextInput, SafeAreaView, KeyboardAvoidingView, Alert } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Ionicons } from "@expo/vector-icons";
-import { Feather } from '@expo/vector-icons';
 import { auth, db } from "../firebase";
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
@@ -22,9 +24,10 @@ const RegisterScreen = () => {
         [
           {
             text: "Cancel",
-            style: "cancel"
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
           },
-          { text: "OK" }
+          { text: "OK", onPress: () => console.log("OK Pressed") },
         ],
         { cancelable: false }
       );
@@ -37,7 +40,8 @@ const RegisterScreen = () => {
 
       setDoc(doc(db, "users", `${myUserUid}`), {
         email: user,
-        phone: phone
+        phone: phone,
+        name: name,
       });
     }).catch((error) => {
       console.log(error.message);
@@ -74,6 +78,23 @@ const RegisterScreen = () => {
 
         <View style={{ marginTop: 50 }}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <AntDesign name="user" size={24} color="black" />
+            <TextInput
+              placeholder="Name"
+              value={name}
+              onChangeText={(text) => setName(text)}
+              placeholderTextColor="black"
+              style={{
+                fontSize: email ? 18 : 18,
+                borderBottomWidth: 1,
+                borderBottomColor: "gray",
+                marginLeft: 13,
+                width: 300,
+                marginVertical: 10,
+              }}
+            />
+          </View>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <MaterialCommunityIcons
               name="email-outline"
               size={24}
@@ -90,7 +111,7 @@ const RegisterScreen = () => {
                 borderBottomColor: "gray",
                 marginLeft: 13,
                 width: 300,
-                marginVertical: 10,
+                marginVertical: 20,
               }}
             />
           </View>
@@ -149,7 +170,10 @@ const RegisterScreen = () => {
             </Text>
           </Pressable>
 
-          <Pressable onPress={() => navigation.goBack()} style={{ marginTop: 20 }}>
+          <Pressable
+            onPress={() => navigation.goBack()}
+            style={{ marginTop: 20 }}
+          >
             <Text
               style={{
                 textAlign: "center",

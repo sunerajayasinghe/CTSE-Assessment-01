@@ -6,6 +6,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import Carousel from "../components/Carousel";
 import Services from "../components/Services";
 import ReviewScreen from "./ReviewScreen";
+import { auth } from "../firebase";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -96,6 +97,23 @@ const HomeScreen = () => {
           <Text style={{ fontSize: 18, fontWeight: "600" }}>Reviews</Text>
           <ReviewScreen />
         </View>
+        <Pressable
+          onPress={() => {
+            if (auth.currentUser.email === "vihangapramudith0@gmail.com") {
+              navigation.navigate("Chat")
+            } else {
+              navigation.navigate("UserChatInterface")
+            }
+          }}
+          style={{ marginLeft: "auto", marginRight: 20 }}
+        >
+          <Image
+            style={{ width: 40, height: 40, borderRadius: 20 }}
+            source={{
+              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREUKCdhJI24euYre5ltBbyO7J_8Ecfq8IT0Q&usqp=CAU",
+            }}
+          />
+        </Pressable>
       </ScrollView>
     </>
   );

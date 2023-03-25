@@ -10,6 +10,9 @@ import DryCleaningScreen from "./screens/DryCleaningScreen";
 import PickUpScreen from "./screens/PickUpScreen";
 import CartScreen from "./screens/CartScreen";
 import OrderScreen from "./screens/OderScreen";
+import ChatScreen from './screens/ChatScreen';
+import ChatInterface from './screens/ChatInterface';
+import UserChatInterface from './screens/UserChatInterface';
 
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -26,6 +29,9 @@ const StackNavigator = () => {
         <Stack.Screen name="PickUp" component={PickUpScreen} options={{ headerShown: true }} />
         <Stack.Screen name="Cart" component={CartScreen} options={{ headerShown: true }} />
         <Stack.Screen name="Order" component={OrderScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="ChatInterface" component={ChatInterface} options={{ headerShown: false }} />
+        <Stack.Screen name="UserChatInterface" component={UserChatInterface} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
