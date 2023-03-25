@@ -53,7 +53,7 @@ const ReviewScreen = () => {
       console.error("Error adding review: ", error);
     }
   };
-  //
+  //handling the review submission
   const handleSubmit = (id) => {
     if (newText !== "") {
       updateReview(id, newText);
