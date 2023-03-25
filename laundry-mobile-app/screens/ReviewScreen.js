@@ -71,7 +71,7 @@ const ReviewScreen = () => {
       console.error("Error updating review: ", error);
     }
   };
-  //
+  //delete review recored from firebase
   const deleteReview = async (id) => {
     try {
       const reviewRef = doc(db, "reviews", id);
