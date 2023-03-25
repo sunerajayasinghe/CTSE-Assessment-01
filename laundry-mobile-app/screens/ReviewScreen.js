@@ -26,6 +26,7 @@ const ReviewScreen = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newText, setNewText] = useState("");
 
+  //load reviews form firebase
   const loadReviews = async () => {
     const reviewsRef = collection(db, "reviews");
     const reviewsSnapshot = await getDocs(reviewsRef);
@@ -36,10 +37,12 @@ const ReviewScreen = () => {
     setReviews(reviewsList);
   };
 
+  //
   useEffect(() => {
     loadReviews();
   }, []);
 
+  //add a new review to firebase
   const addReview = async () => {
     try {
       const reviewsRef = collection(db, "reviews");
