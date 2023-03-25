@@ -89,6 +89,7 @@ const ReviewScreen = () => {
       <View style={styles.review}>
         <Text style={styles.reviewText}>{item.text}</Text>
         <View style={styles.buttonsContainer}>
+          {/* modal for update review record  */}
           <Modal isVisible={isModalVisible}>
             <View style={styles.modalContent}>
               <TextInput
